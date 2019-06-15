@@ -149,7 +149,7 @@ As previously explained, the state should be immutable. In order to keep with th
 
 Dan uses deepfreeze and expect libraries to test for this.
 
-*Example*
+**Example**
 
 *wrong*
 ```javascript
@@ -165,5 +165,44 @@ const addCounter = (list) => {
     return list.concat([0]);
 }
 ```
+*also right*
+```javascript
+const addCounter = (list) => {
+    return [...list, 0];
+}
+```
 
-##
+###### For more information on the spread operator [see this.](https://www.geeksforgeeks.org/javascript-spread-operator/)
+
+## Reducer example (avoiding mutation)
+
+```javascript
+const todos = (state = [], action) => {
+     switch(action.type) {
+         case 'ADD_TODO':
+            return [
+                ...state,
+                {
+                    id: action.id,
+                    text: action.text,
+                    completed: false
+                }
+            ];
+        case 'TOGGLE_TODO':
+            return state.map(todo => {
+                if (todo.id !== action.id) {
+                    return todo;
+                }
+
+                return {
+                    ...todo,
+                    completed: !todo.completedx
+                };
+            });
+        default:
+            return state;
+     }
+};
+```
+
+Here we can see all the important aspects of a reducer. Specifically the use of the spread operator in order to avoid mutation. On a side note, it is recommendable to have one reducer that calls other reducers that abstract how an action should be handled. This is not necessary but its good practice and can help with maintainability and readability.
