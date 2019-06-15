@@ -78,7 +78,7 @@ console.log(store.getState());
 
 ### dispatch()
 
-The most used one. It dispatches actions to change the state of our application.
+The most used one. It dispatches actions to change the state of our application. It takes in the action object.
 ```Javascript
 const { createStore } = Redux;
 const store = createStore(counter);
@@ -87,4 +87,27 @@ console.log(store.getState());
 store.dispatch({ type: 'INCREMENT'});
 ```
 
+### suscribe()
 
+It lets you register a callback that the Redux store is going to call everytime an action has been dispatched so that you can update the UI with the new state.
+
+```Javascript
+const { createStore } = Redux;
+const store = createStore(counter);
+console.log(store.getState());
+
+const render = () => {
+    document.body.innerText = store.getState();
+}
+
+store.suscribe(render);
+render();
+
+document.addEventListener('click', () => {
+    store.dispatch({ type: 'INCREMENT' });
+});
+```
+
+So what is going on here? We created an event listener. Everytime we click it is going to dispatch an action of type increment, then the state changes. Before that we suscribed the render method, meaning that everytime that we execute the action the render method is going to happen as a callback. In this method Dan renders the state to the browser. 
+
+`suscribe => bind action to click => action => new state => callback(render)`
