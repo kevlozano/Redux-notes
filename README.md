@@ -46,3 +46,45 @@ What is going on here? In this basic reducer function we are decreasing or incre
 1. The state is initialized in the first line with an ES6 default argument syntax.
 2. We handle the INCREMENT action type correctly as well as DECREMENT
 3. We have an option for when an action is not defined correctly: the default. This only returns the current state.
+
+## Methods
+
+Creating a store.
+
+```Javascript
+const { createStore } = Redux;
+//or
+import { createStore } from 'redux'
+```
+
+The store binds together the 3 core principles of redux. It stores the state tree. After that we have to create the reducer function.
+
+```Javascript
+const { createStore } = Redux;
+const store = createStore(counter);
+```
+
+Counter is the function we created previously. It is a reducer. The store has *3 important methods.*
+
+### getState()
+
+Retrieves the current state of the store (0 in this case).
+
+```Javascript
+const { createStore } = Redux;
+const store = createStore(counter);
+console.log(store.getState());
+```
+
+### dispatch()
+
+The most used one. It dispatches actions to change the state of our application.
+```Javascript
+const { createStore } = Redux;
+const store = createStore(counter);
+console.log(store.getState());
+
+store.dispatch({ type: 'INCREMENT'});
+```
+
+
