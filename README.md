@@ -111,3 +111,59 @@ document.addEventListener('click', () => {
 So what is going on here? We created an event listener. Everytime we click it is going to dispatch an action of type increment, then the state changes. Before that we suscribed the render method, meaning that everytime that we execute the action the render method is going to happen as a callback. In this method Dan renders the state to the browser. 
 
 `suscribe => bind action to click => action => new state => callback(render)`
+
+## Implement store from scratch
+
+```javascript
+const createStore = (reducer) => {
+    let state;
+    let listeners = [];
+
+    const getState = () => state;
+
+    const dispatch = (action) => {
+        state = redicer(state, action);
+        listeners.forEach(listener => listener());
+    };
+
+    const suscribe = (listener) => {
+        listeners.push(listener);
+        return () => {
+            listeners = listeners.filter(l => l !== listener);
+        };
+    };
+
+    dispatch([]);
+
+    return { getState, dispatch, suscribe };
+};
+```
+###### IMPORTANT: this function is already provided by redux, this is a recreation to see how it works under the hood.
+
+In here the only argument it needs is the reducer. Has the three main methods (getstate, dispatch, suscribe). We have an array with all the listeners. We see in the dispatch method that everytime it gets call it loops through the listeners array and calls each one. That way we can trigger all of them at every action.
+The suscribe method has a way to unsuscribe too. The dummy action at the end is to populate is the initial state.
+
+## Avoiding array mutations
+
+As previously explained, the state should be immutable. In order to keep with this principle we need to make sure we use the right methods. For example: `concat()` `slice()` and the spread operator `...`. 
+
+Dan uses deepfreeze and expect libraries to test for this.
+
+*Example*
+
+*wrong*
+```javascript
+const addCounter = (list) => {
+    list.push(0);
+    return list;
+}
+```
+
+*right*
+```javascript
+const addCounter = (list) => {
+    return list.concat([0]);
+}
+```
+
+##
