@@ -196,7 +196,7 @@ const todos = (state = [], action) => {
 
                 return {
                     ...todo,
-                    completed: !todo.completedx
+                    completed: !todo.completed
                 };
             });
         default:
@@ -206,3 +206,99 @@ const todos = (state = [], action) => {
 ```
 
 Here we can see all the important aspects of a reducer. Specifically the use of the spread operator in order to avoid mutation. On a side note, it is recommendable to have one reducer that calls other reducers that abstract how an action should be handled. This is not necessary but its good practice and can help with maintainability and readability.
+
+## Reducers composition
+
+```javascript
+//this is completely new, its an abstraction
+const todo = (state, action) => {
+    switch(action.type) {
+         case 'ADD_TODO':
+            return [
+                ...state,
+                {
+                    id: action.id,
+                    text: action.text,
+                    completed: false
+                }
+            ];
+        case 'TOGGLE_TODO':
+            return state.map(todo => {
+                if (state.id !== action.id) {
+                    return state;
+                }
+
+                return {
+                    ...state,
+                    completed: !state.completed
+                };
+            });
+        default:
+            return state;
+     }
+}
+
+const todos = (state = [], action) => {
+     switch(action.type) {
+         case 'ADD_TODO':
+            return [
+                ...state,
+                // this changed compared to the previos example
+                todo(undefined, action)
+            ];
+        case 'TOGGLE_TODO':
+        //this also changed
+            return state.map(t => todo(t, action));
+        default:
+            return state;
+     }
+};
+```
+
+Ok this can be a lot. At least it took me a while to understand. *This peice of code does exactly the same as the previous one.* So what changed? we extracted the TODO creation/modification. For this we created a new function called todo, while todoS still exists but only to call todo with the right arguments.
+
+Go through the code and check the comments. We could refer to todos as a parent function, it still has the switch and it will call todo with the right arguments to perform the correct action. Note that in the todo function the first argument is still called state, *altough it isn't the state*, it is, in the case of TOGGLE_TODO, one of the todos beign looped through.
+
+In simpler words. Reducer composition is extracting functions to perform our state changing tasks more clearly. That makes it easier to mantain and read. *Ish*.
+
+**Personal opinion**
+
+This example that Dan uses is a clear view of what I don't like about Redux, it is unnecessarily complicated. Extracting functions to make code readable is pretty normal but Dan's use of terminology and naming is too complicated. The same thing happens with Redux all around. Why call it state in the case of TOGGLE_TODO, why not abstract that and call the argument todo? I don't know, maybe someone with more experience could enlight me. Also, breaking up the visual format of the arguments of the reducer took me off guard, again, nothing crazy, but was it really necessary?
+
+*rant over*
+
+## Combining reducers
+
+```javascript
+const visibilityFilter = (
+    state = 'SHOW_ALL',
+    action
+) => {
+    switch (action.type) {
+        case 'SET_VISIBILITY_FILTER':
+            return action.filter
+        default:
+            return state;
+    }
+};
+```
+Here we created a new function. We are going to combining all reducers into a single one for ease of use. This one right here takes care of the visibility filter, *only the visibility filter*.
+
+```javascript
+const todoApp = (state = {}, action) => {
+    return {
+        todos: todos(
+            state.todos,
+            action
+        ),
+        visibilityFilter: visibilityFilter(
+            state.visibilityFilter,
+            action
+        )
+    };
+};
+```
+
+This is the combiner. Look at what it returns: *a single object*. So, in the return it is going to call all the reducers (in this case the todos reducer and the visibilityFilter reducer) and then combines them all in one object which it returns. Thats why the filter reducer only changes action.filter, and doesn't need any spread operator or state.
+
+This pattern helps scale Redux apps.
