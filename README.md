@@ -302,3 +302,58 @@ const todoApp = (state = {}, action) => {
 This is the combiner. Look at what it returns: *a single object*. So, in the return it is going to call all the reducers (in this case the todos reducer and the visibilityFilter reducer) and then combines them all in one object which it returns. Thats why the filter reducer only changes action.filter, and doesn't need any spread operator or state.
 
 This pattern helps scale Redux apps.
+
+## combineReducers()
+
+```javascript
+const { combineReducers } = Redux;
+const todoApp = combineReducers({
+    todos: todos,
+    visibilityFilter: visibilityFilter
+});
+```
+
+This pattern is so common that is present in most redux apps so redux provides a function to create the top level reducer. This way we can avoid typing the `todoApp` function we just used. The only argument it needs is an object, this lets you *specify the mapping between the state field names and the reduces managing them.* Thats all it does.
+
+### example on how to use the Store
+
+```javascript
+const { component} = React;
+
+let nextTodoId = 0;
+class TodoApp extends Component {
+    render() {
+        return (
+            <div>
+                <button onClick={() => {
+                    store.dispatch({
+                        type: 'ADD_TODO',
+                        text: 'Test',
+                        id: netTodoId++
+                    });
+                }}>
+                    Add Todo
+                </button>
+                <ul>
+                    {this.props.todos.map(todo =>
+                        <li key={todo.id}>
+                            {todo.text}
+                        </li>
+                    )}
+                </ul>
+            </div>
+        );
+    }
+}
+
+const render = () => {
+    ReactDOM.render(
+        <TodoApp
+            todos={store.getState().todos}
+        />,
+        document.getElementById('root') 
+    );
+}
+```
+
+This is basic example with React. On the render function we get all the todos from the store and pass them as props. Then we render all of them inside a list using the map method. The button adds a new one.
