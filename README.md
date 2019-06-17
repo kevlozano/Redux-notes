@@ -386,3 +386,45 @@ render() {
     )
 }
 ```
+
+What is important here is to realize that you can access the state of the whole app from anywhere, to keep it clean we do it within the container components, so they're clean and easy to use and also so that the presentational components are easy to reuse.
+
+## Passing the store as context
+
+We first tried passing the store as props to every container component but that doesn't scale well. The best practice is to create a Provider. The react feature 'context' is used here, this makes the context object available to every children. 
+
+```javascript
+
+
+class Provider extends Component {
+    getChildContext() {
+        return {
+            store: this.props.store;
+        }   
+    }
+    render() {
+        return this.props.children;
+    }
+}
+
+//this is essential for context to be turned on
+Provider.childContextTypes = {
+    store: React.PropTypes.object
+};
+
+//make sure you add a similar thing in the container components
+ContainerComponent.contextTypes = {
+    store: React.PropTypes.object
+};
+
+//the context should be accessed as this.context
+
+ReactDOM.render(
+    <Provider store={createStore(todoApp)}>
+        <TodoApp />
+    </Provider>,
+    document.getElementById('root');
+)
+```
+
+###### NOTE: it is not necessary to make the provider yourself, it comes with the react-redux library
