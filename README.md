@@ -329,7 +329,7 @@ class TodoApp extends Component {
                     store.dispatch({
                         type: 'ADD_TODO',
                         text: 'Test',
-                        id: netTodoId++
+                        id: TodoId++
                     });
                 }}>
                     Add Todo
@@ -357,3 +357,32 @@ const render = () => {
 ```
 
 This is basic example with React. On the render function we get all the todos from the store and pass them as props. Then we render all of them inside a list using the map method. The button adds a new one.
+
+## React cases
+
+Dan goes onto extracting presentational and container components. The most interesting the part of this is the 'callback hell'. Passing tons of props and callbacks through parent components defeats the purpose of Redux, so the ideal method is to obtain the state in the container functional components directly from the store and pass it to the presentational components that are children to it as props.
+
+Also, instead of suscribing the whole app to the store, we can suscribe to it in the componentDidMount lifecicle for efficiency.
+
+```javascript
+class FilterLink extends Component {
+    componentDidMount() {
+        this.unsusbcribe = store.suscribe(() =>
+            this.forceUpdate();
+        );
+    }
+}
+
+componentWillUnmount() {
+    this.unsubscribe();
+}
+
+render() {
+    const props = this.props;
+    const state = store.getState();
+
+    return (
+        ...
+    )
+}
+```
