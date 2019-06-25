@@ -428,3 +428,66 @@ ReactDOM.render(
 ```
 
 ###### NOTE: it is not necessary to make the provider yourself, it comes with the react-redux library
+
+``` javascript
+import { Provider } from 'react-redux';
+```
+
+## Container example
+
+```javascript
+class VisibleTodoList extends Component {
+    componentDidMount() {
+        const { store } = this.context;
+        this.unsuscribe = store.suscribe(() =>
+            this.forceUpdate()
+        );
+    }
+
+    componentWillMount() {
+        this.unsuscribe();
+    }
+
+    render() {
+        const props = this.props;
+        const { store } = this.context;
+        const state = store.getState();
+
+        return (
+            ...
+        )
+    }
+};
+```
+
+## Using connect
+
+```javascript
+const mapStatetToProps = (state) => {
+    return {
+        todos: getVisibleTodos(
+            state.todos,
+            state.visibilityFilter
+        )
+    };
+};
+
+const mapDispatchToProps = (dispatch) => {
+    return {
+        onTodoClick: (id) => {
+            dispatch({
+                type: 'TOGGLE_TODO',
+                id
+            })
+        }
+    }
+}
+
+import { connect } from 'react-redux';
+const VisibleTodoList = connect(
+    mapStateToProps,
+    mapDispatchToProps
+)(TodoList);
+```
+
+So here is the actual way to do it. The connect function does almost everything for you! by declaring the 2 functions that we need (stateToProps and dispatchToProps) we only need to pass the presentational component to the function and voila.
