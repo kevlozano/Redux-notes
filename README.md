@@ -391,7 +391,7 @@ What is important here is to realize that you can access the state of the whole 
 
 ## Passing the store as context
 
-We first tried passing the store as props to every container component but that doesn't scale well. The best practice is to create a Provider. The react feature 'context' is used here, this makes the context object available to every children. 
+We first tried passing the store as props to every container component but that doesn't scale well. The best practice is to create a Provider. The react feature 'context' is used here, this makes the context object available to every children (with `const { store } = this.context;`). 
 
 ```javascript
 
